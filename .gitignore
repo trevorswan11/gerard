@@ -1,0 +1,9 @@
+.vscode
+
+.env
+service_account.json
+
+assets/gen
+assets/stored_data/
+
+/target
