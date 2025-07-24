@@ -41,11 +41,10 @@ pub fn combine_images(user_id: &str, image_names: Vec<&str>) -> Result<String, B
     let output_img = DynamicImage::ImageRgba8(combined).to_rgba8();
     output_img.save(&output_path)?;
 
-    if let Some(path_out) = output_path.to_str() {
-        Ok(path_out.to_string())
-    } else {
-        Err(format!("Cannot return path: {:?}", output_path).into())
-    }
+    output_path
+        .to_str()
+        .map(|s| s.to_string())
+        .ok_or(format!("Cannot return path: {:?}", output_path).into())
 }
 
 fn find_images(image_names: Vec<&str>, folder_path: &str) -> Result<Vec<PathBuf>, Box<dyn Error>> {
