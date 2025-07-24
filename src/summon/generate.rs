@@ -1,6 +1,4 @@
-use std::error::Error;
-use std::fs;
-use std::path::{Path, PathBuf};
+use std::{error::Error, fs, path::Path, path::PathBuf};
 
 use image::{DynamicImage, GenericImage, GenericImageView, ImageBuffer, RgbaImage};
 use walkdir::WalkDir;
@@ -50,10 +48,7 @@ pub fn combine_images(user_id: &str, image_names: Vec<&str>) -> Result<String, B
     }
 }
 
-fn find_images(
-    image_names: Vec<&str>,
-    folder_path: &str,
-) -> Result<Vec<PathBuf>, Box<dyn Error>> {
+fn find_images(image_names: Vec<&str>, folder_path: &str) -> Result<Vec<PathBuf>, Box<dyn Error>> {
     let mut paths = Vec::new();
 
     for name in image_names {

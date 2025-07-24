@@ -149,4 +149,3 @@ pub static THREE_STAR_WEAPONS: &[&str] = &[
     "white_iron_greatsword.webp",
     "white_tassel.webp",
 ];
-

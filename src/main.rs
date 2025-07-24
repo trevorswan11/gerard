@@ -1,5 +1,5 @@
 #![allow(deprecated, dead_code)]
-mod google;
+mod external;
 mod replies;
 mod summon;
 mod utils;
