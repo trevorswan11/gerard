@@ -6,4 +6,6 @@ service_account.json
 assets/gen
 assets/stored_data/
 
+*.mp3
+
 /target
