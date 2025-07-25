@@ -1006,7 +1006,6 @@ version = "0.1.0"
 dependencies = [
  "base64 0.22.1",
  "dotenv",
- "hound",
  "image",
  "poise",
  "reqwest 0.12.22",
@@ -1190,12 +1189,6 @@ dependencies = [
  "strum",
  "thiserror 1.0.69",
 ]
-
-[[package]]
-name = "hound"
-version = "3.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "62adaabb884c94955b19907d60019f4e145d091c75345379e70d1ee696f7854f"
 
 [[package]]
 name = "http"

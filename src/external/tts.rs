@@ -2,21 +2,16 @@
 use crate::utils::driver::*;
 
 use std::{
-    fs::{self, File},
-    io::{BufWriter, Write},
-    path::{Path, PathBuf},
+    fs::{self, File as StdFile},
+    io::Write,
+    path::PathBuf,
     time::Duration,
 };
 
 use base64::decode;
-use hound::{SampleFormat, WavSpec, WavWriter};
-use poise::serenity_prelude::{self as serenity};
 use serde::{Deserialize, Serialize};
-use songbird::input::Input;
-use symphonia::core::{
-    audio::{SampleBuffer, Signal}, codecs::DecoderOptions, formats::FormatOptions, io::MediaSourceStream, meta::MetadataOptions, probe::Hint,
-};
-use symphonia::default::{get_codecs, get_probe};
+use songbird::input::File as SongFile;
+use songbird::tracks::Track;
 use tokio::time::sleep;
 use yup_oauth2::{ServiceAccountAuthenticator, ServiceAccountKey};
 
@@ -109,7 +104,7 @@ async fn generate_mp3(text: String, output_path: &PathBuf) -> Result<(), Error> 
     };
 
     tokio::fs::create_dir_all(output_path.parent().unwrap()).await?;
-    let mut file = File::create(&output_path)?;
+    let mut file = StdFile::create(&output_path)?;
     file.write_all(&audio_data)?;
     Ok(())
 }
@@ -119,26 +114,19 @@ pub async fn tts(
     ctx: Context<'_>,
     #[description = "Convert text to speech"] text: String,
 ) -> Result<(), crate::utils::driver::Error> {
-    let guild = ctx.guild_id().ok_or("Could not get guild ID")?;
+    let guild_id = ctx.guild_id().ok_or("Guild ID not available")?;
+    let voice_channel_id = {
+        let guild = ctx
+            .serenity_context()
+            .cache
+            .guild(guild_id)
+            .ok_or_else(|| "Failed to get Guild ID")?;
 
-    let voice_channel_id = match ctx.guild_channel().await {
-        Some(guild_channel) => {
-            let channels = guild.channels(ctx.serenity_context()).await?;
-            let channel = channels
-                .get(&guild_channel.id)
-                .ok_or("Did not recognize channel id")?;
-            if channel.kind == serenity::ChannelType::Voice {
-                guild_channel.id
-            } else {
-                ctx.say("You need to be in a voice channel to use this command!")
-                    .await?;
-                return Ok(());
-            }
-        }
-        None => {
-            ctx.say("Did not recognize channel id").await?;
-            return Ok(());
-        }
+        let vs = guild
+            .voice_states
+            .get(&ctx.author().id)
+            .and_then(|vs| vs.channel_id);
+        vs.ok_or("You're not in a voice channel")?
     };
 
     let output_path = PathBuf::from(format!(
@@ -151,17 +139,12 @@ pub async fn tts(
     let manager = songbird::get(ctx.serenity_context())
         .await
         .expect("Songbird Voice client placed in at initialization.");
+    let source = SongFile::new(output_path);
+    let track = Track::from(source).volume(1.0);
 
-    let join_result = manager.join(guild, voice_channel_id).await;
-    if let Ok(handler_lock) = join_result {
-        let mut handler = handler_lock.lock().await;
-        let path_str = output_path
-            .as_path()
-            .to_str()
-            .ok_or_else(|| "Invalid path buffer".to_string())?
-            .to_string();
-        let source = Input::try_from(path_str)?;
-        let track_handle = handler.play_input(source);
+    if let Ok(call_lock) = manager.join(guild_id, voice_channel_id).await {
+        let mut call = call_lock.lock().await;
+        let track_handle = call.play(track);
         while let Some(state) = track_handle.get_info().await.ok() {
             if state.playing.is_done() {
                 break;
@@ -169,9 +152,10 @@ pub async fn tts(
             sleep(Duration::from_millis(250)).await;
         }
 
-        handler.leave().await?;
+        call.leave().await?;
     } else {
         ctx.say("Failed to join voice channel.").await?;
     }
+
     Ok(())
 }
