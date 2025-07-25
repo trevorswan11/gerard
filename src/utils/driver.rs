@@ -1,6 +1,8 @@
 use crate::replies::basic::*;
+use crate::external::tts::*;
 
 use poise::serenity_prelude as serenity;
+use songbird::SerenityInit;
 
 pub struct Handler;
 pub struct Data {}
@@ -10,7 +12,7 @@ pub type Context<'a> = poise::Context<'a, Data, Error>;
 pub async fn start_bot(discord_token: &str, intents: serenity::GatewayIntents) {
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![age()],
+            commands: vec![age(), tts()],
             ..Default::default()
         })
         .setup(|ctx, ready, framework| {
@@ -24,6 +26,7 @@ pub async fn start_bot(discord_token: &str, intents: serenity::GatewayIntents) {
 
     let mut client = serenity::ClientBuilder::new(discord_token, intents)
         .framework(framework)
+        .register_songbird()
         .await
         .expect("Error creating Client");
 
