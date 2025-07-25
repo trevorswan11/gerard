@@ -4,7 +4,8 @@
 service_account.json
 
 assets/gen
-assets/stored_data/
+assets/stored_data
+assets/lethal
 
 *.mp3
 
