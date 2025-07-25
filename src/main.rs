@@ -1,6 +1,6 @@
 #![allow(deprecated, dead_code)]
 mod external;
-mod replies;
+mod internal;
 mod summon;
 mod utils;
 

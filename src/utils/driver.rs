@@ -1,5 +1,5 @@
-use crate::replies::basic::*;
-use crate::external::tts::*;
+use crate::internal::basic::*;
+use crate::external::tts::tts;
 
 use poise::serenity_prelude as serenity;
 use songbird::SerenityInit;
