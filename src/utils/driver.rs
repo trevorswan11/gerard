@@ -1,5 +1,6 @@
-use crate::internal::basic::*;
 use crate::external::tts::tts;
+use crate::summon::wish::wish;
+use crate::internal::basic::*;
 
 use poise::serenity_prelude as serenity;
 use songbird::SerenityInit;
@@ -12,7 +13,11 @@ pub type Context<'a> = poise::Context<'a, Data, Error>;
 pub async fn start_bot(discord_token: &str, intents: serenity::GatewayIntents) {
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![age(), tts()],
+            commands: vec![age(), tts(), wish()],
+            prefix_options: poise::PrefixFrameworkOptions {
+                prefix: Some("!".into()),
+                ..Default::default()
+            },
             ..Default::default()
         })
         .setup(|ctx, ready, framework| {

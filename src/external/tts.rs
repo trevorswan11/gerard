@@ -128,6 +128,7 @@ pub async fn tts(
             .and_then(|vs| vs.channel_id);
         vs.ok_or("You're not in a voice channel")?
     };
+    ctx.defer().await?;
 
     let output_path = PathBuf::from(format!(
         "./assets/gen/{}-tts.mp3",

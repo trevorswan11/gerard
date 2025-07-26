@@ -1,4 +1,6 @@
-use std::{error::Error, fs, path::Path, path::PathBuf};
+use crate::utils::driver::Error;
+
+use std::{fs, path::Path, path::PathBuf};
 
 use image::{DynamicImage, GenericImage, GenericImageView, ImageBuffer, RgbaImage};
 use walkdir::WalkDir;
@@ -6,7 +8,7 @@ use walkdir::WalkDir;
 pub static IMAGE_DIR: &str = "assets/summon_images";
 pub static OUTPUT_DIR: &str = "assets/gen";
 
-pub fn combine_images(user_id: &str, image_names: Vec<&str>) -> Result<String, Box<dyn Error>> {
+pub fn combine_images(user_id: &str, image_names: Vec<String>) -> Result<String, Error> {
     let image_paths = find_images(image_names, IMAGE_DIR)?;
     if image_paths.is_empty() {
         return Err("No images found".into());
@@ -47,7 +49,7 @@ pub fn combine_images(user_id: &str, image_names: Vec<&str>) -> Result<String, B
         .ok_or(format!("Cannot return path: {:?}", output_path).into())
 }
 
-fn find_images(image_names: Vec<&str>, folder_path: &str) -> Result<Vec<PathBuf>, Box<dyn Error>> {
+fn find_images(image_names: Vec<String>, folder_path: &str) -> Result<Vec<PathBuf>, Error> {
     let mut paths = Vec::new();
 
     for name in image_names {
