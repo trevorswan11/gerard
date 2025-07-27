@@ -209,12 +209,10 @@ pub async fn wish(
         let pulls = text.parse::<usize>()?;
         if 1 <= pulls && pulls <= 90 {
             let results = summon(&user_id, &guild_id, pulls)?;
-            let amalgamation = generate::combine_images(&user_id, results);
-            if let Ok(path) = amalgamation {
-                let file_bytes = tokio::fs::read(&path).await?;
+            if let Ok((bytes, name)) = generate::combine_images(&user_id, results) {
                 ctx.send(
                     poise::CreateReply::default()
-                        .attachment(CreateAttachment::bytes(file_bytes, path)),
+                        .attachment(CreateAttachment::bytes(bytes, name)),
                 )
                 .await?;
             } else {

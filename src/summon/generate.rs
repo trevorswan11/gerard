@@ -1,6 +1,6 @@
 use crate::utils::driver::Error;
 
-use std::{fs, path::Path, path::PathBuf};
+use std::{path::PathBuf, io::Cursor};
 
 use image::{DynamicImage, GenericImage, GenericImageView, ImageBuffer, RgbaImage};
 use walkdir::WalkDir;
@@ -8,7 +8,7 @@ use walkdir::WalkDir;
 pub static IMAGE_DIR: &str = "assets/summon_images";
 pub static OUTPUT_DIR: &str = "assets/gen";
 
-pub fn combine_images(user_id: &str, image_names: Vec<String>) -> Result<String, Error> {
+pub fn combine_images(user_id: &str, image_names: Vec<String>) -> Result<(Vec<u8>, String), Error> {
     let image_paths = find_images(image_names, IMAGE_DIR)?;
     if image_paths.is_empty() {
         return Err("No images found".into());
@@ -36,17 +36,10 @@ pub fn combine_images(user_id: &str, image_names: Vec<String>) -> Result<String,
         combined.copy_from(img, x, y)?;
     }
 
-    let output_filename = format!("{}-summon.png", user_id);
-    let output_path = Path::new(OUTPUT_DIR).join(output_filename);
-    fs::create_dir_all(OUTPUT_DIR)?;
-
-    let output_img = DynamicImage::ImageRgba8(combined).to_rgba8();
-    output_img.save(&output_path)?;
-
-    output_path
-        .to_str()
-        .map(|s| s.to_string())
-        .ok_or(format!("Cannot return path: {:?}", output_path).into())
+    let mut buffer = Cursor::new(Vec::new());
+    let output_img = DynamicImage::ImageRgba8(combined);
+    output_img.write_to(&mut buffer, image::ImageFormat::Png)?;
+    Ok((buffer.into_inner(), format!("{user_id}-summon.png")))
 }
 
 fn find_images(image_names: Vec<String>, folder_path: &str) -> Result<Vec<PathBuf>, Error> {
