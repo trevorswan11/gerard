@@ -6,19 +6,23 @@ mod utils;
 
 use std::env;
 
-use dotenv;
+use dotenvy::dotenv;
 use poise::serenity_prelude::GatewayIntents;
 use tokio::signal;
 
-fn init_tracing() {
-    console_subscriber::init();
-}
-
 #[tokio::main]
 async fn main() {
-    init_tracing();
-
-    dotenv::dotenv().expect("Failed to load .env file");
+    dotenv().ok();
+    if true {
+        let dict = external::dict::Dictionary::new();
+        let word = "quick";
+        match dict.definition(word).await {
+            Ok(Some(defs)) => println!("Definitions for {}: {}", word, defs.join("; ")),
+            Ok(None) => println!("No definition found."),
+            Err(e) => eprintln!("Error: {}", e),
+        }
+        return;
+    }
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
     let intents = GatewayIntents::GUILDS
         | GatewayIntents::GUILD_MESSAGES

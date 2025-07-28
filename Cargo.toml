@@ -14,15 +14,10 @@ yup-oauth2 = "12.1.0"
 symphonia = { version = "0.5", features = ["mp3"] }
 rand = "0.9.2"
 
-# Profiling
-console-subscriber = "0.2"
-tracing-subscriber = "0.3"
-tracing = "0.1"
-
 # Primary dependencies
 rayon = "1.10.0"
-dotenv = "0.15.0"
+dotenvy = "0.15.7"
 poise = "0.6.0"
-tokio = { version = "1", features = ["full", "tracing"] }
+tokio = { version = "1.47.0", features = ["full"] }
 image = "0.25"
 walkdir = "2"
