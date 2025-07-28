@@ -89,14 +89,7 @@ async fn generate_mp3(text: String) -> Result<Vec<u8>, Error> {
         return Err(format!("Google TTS API error: {}", text).into());
     }
     let tts_response: TtsResponse = res.json().await?;
-
-    let audio_data = match decode(&tts_response.audioContent) {
-        Ok(d) => d,
-        Err(e) => {
-            return Err(format!("Failed to decode audio content: {}", e).into());
-        }
-    };
-    Ok(audio_data)
+    return decode(&tts_response.audioContent).map_err(|e| Box::new(e) as Error);
 }
 
 #[poise::command(
