@@ -113,7 +113,7 @@ async fn generate_mp3(text: String, output_path: &PathBuf) -> Result<(), Error> 
 pub async fn tts(
     ctx: Context<'_>,
     #[description = "Convert text to speech"] text: String,
-) -> Result<(), crate::utils::driver::Error> {
+) -> Result<(), Error> {
     let guild_id = ctx.guild_id().ok_or("Guild ID not available")?;
     let voice_channel_id = {
         let guild = ctx

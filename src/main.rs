@@ -13,16 +13,6 @@ use tokio::signal;
 #[tokio::main]
 async fn main() {
     dotenv().ok();
-    if true {
-        let dict = external::dict::Dictionary::new();
-        let word = "quick";
-        match dict.definition(word).await {
-            Ok(Some(defs)) => println!("Definitions for {}: {}", word, defs.join("; ")),
-            Ok(None) => println!("No definition found."),
-            Err(e) => eprintln!("Error: {}", e),
-        }
-        return;
-    }
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
     let intents = GatewayIntents::GUILDS
         | GatewayIntents::GUILD_MESSAGES

@@ -1,4 +1,4 @@
-use crate::external::tts::tts;
+use crate::external::{dict::*, tts::tts};
 use crate::internal::basic::*;
 use crate::summon::wish::wish;
 
@@ -13,7 +13,7 @@ pub type Context<'a> = poise::Context<'a, Data, Error>;
 pub async fn start_bot(discord_token: &str, intents: serenity::GatewayIntents) {
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
-            commands: vec![age(), tts(), wish()],
+            commands: vec![age(), tts(), wish(), define(), synonyms(), antonyms()],
             prefix_options: poise::PrefixFrameworkOptions {
                 prefix: Some("!".into()),
                 ..Default::default()
