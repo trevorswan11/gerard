@@ -2,7 +2,7 @@
 use crate::summon::{generate, pool::*};
 use crate::utils::driver::*;
 
-use std::{fs, path::Path, collections::HashMap};
+use std::{collections::HashMap, fs, path::Path};
 
 use poise::serenity_prelude::CreateAttachment;
 use rand::Rng;
@@ -148,11 +148,15 @@ fn summon(user_id: &str, guild_id: &str, pulls: usize) -> Result<Vec<String>, Er
     Ok(results)
 }
 
-#[poise::command(slash_command, prefix_command)]
+#[poise::command(
+    slash_command,
+    prefix_command,
+    description_localized("en-US", "Perform between 1 and 90 Genshin Impact wishes")
+)]
 pub async fn wish(
     ctx: Context<'_>,
-    #[description = "Perform between 1 and 90 Genshin Impact wishes"] text: String,
-) -> Result<(), crate::utils::driver::Error> {
+    #[description = "Either 'me', 'server', or number (1-90)"] text: String,
+) -> Result<(), Error> {
     let channel_name = ctx
         .channel_id()
         .name(ctx.serenity_context().http.clone())

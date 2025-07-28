@@ -121,11 +121,16 @@ async fn send_response(
     return Ok(());
 }
 
-#[poise::command(slash_command, prefix_command)]
+#[poise::command(
+    slash_command,
+    prefix_command,
+    description_localized("en-US", "Define a word")
+)]
 pub async fn define(
     ctx: Context<'_>,
-    #[description = "Define a word"] word: String,
+    #[description = "The word to define"] word: String,
 ) -> Result<(), Error> {
+    ctx.defer().await?;
     let dict = Dictionary::new();
     let msg = dict
         .definition(&word)
@@ -134,11 +139,16 @@ pub async fn define(
     send_response(ctx, msg, "definitions", &word).await
 }
 
-#[poise::command(slash_command, prefix_command)]
+#[poise::command(
+    slash_command,
+    prefix_command,
+    description_localized("en-US", "Get synonyms of a word")
+)]
 pub async fn synonyms(
     ctx: Context<'_>,
-    #[description = "Get synonyms of a word"] word: String,
+    #[description = "The word to get synonyms of"] word: String,
 ) -> Result<(), Error> {
+    ctx.defer().await?;
     let dict = Dictionary::new();
     let msg = dict
         .synonyms(&word)
@@ -147,11 +157,16 @@ pub async fn synonyms(
     send_response(ctx, msg, "synonyms", &word).await
 }
 
-#[poise::command(slash_command, prefix_command)]
+#[poise::command(
+    slash_command,
+    prefix_command,
+    description_localized("en-US", "Get antonyms of a word")
+)]
 pub async fn antonyms(
     ctx: Context<'_>,
-    #[description = "Get antonyms of a word"] word: String,
+    #[description = "The word to get antonyms of"] word: String,
 ) -> Result<(), Error> {
+    ctx.defer().await?;
     let dict = Dictionary::new();
     let msg = dict
         .antonyms(&word)

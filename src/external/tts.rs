@@ -1,16 +1,10 @@
 #![allow(non_snake_case)]
 use crate::utils::driver::*;
 
-use std::{
-    fs::{self, File as StdFile},
-    io::Write,
-    path::PathBuf,
-    time::Duration,
-};
+use std::{fs, time::Duration};
 
 use base64::decode;
 use serde::{Deserialize, Serialize};
-use songbird::input::File as SongFile;
 use songbird::tracks::Track;
 use tokio::time::sleep;
 use yup_oauth2::{ServiceAccountAuthenticator, ServiceAccountKey};
@@ -64,7 +58,7 @@ async fn get_access_token() -> Result<String, Error> {
         .ok_or("Could not decode valid access token".into())
 }
 
-async fn generate_mp3(text: String, output_path: &PathBuf) -> Result<(), Error> {
+async fn generate_mp3(text: String) -> Result<Vec<u8>, Error> {
     let token = get_access_token().await?;
 
     let request_body = TtsRequest {
@@ -102,17 +96,19 @@ async fn generate_mp3(text: String, output_path: &PathBuf) -> Result<(), Error> 
             return Err(format!("Failed to decode audio content: {}", e).into());
         }
     };
-
-    tokio::fs::create_dir_all(output_path.parent().unwrap()).await?;
-    let mut file = StdFile::create(&output_path)?;
-    file.write_all(&audio_data)?;
-    Ok(())
+    Ok(audio_data)
 }
 
-#[poise::command(slash_command, prefix_command)]
+#[poise::command(
+    slash_command,
+    prefix_command,
+    description_localized("en-US", "Convert text to speech")
+)]
 pub async fn tts(
     ctx: Context<'_>,
-    #[description = "Convert text to speech"] text: String,
+    #[rest]
+    #[description = "The text to convert"]
+    text: String,
 ) -> Result<(), Error> {
     let guild_id = ctx.guild_id().ok_or("Guild ID not available")?;
     let voice_channel_id = {
@@ -130,17 +126,12 @@ pub async fn tts(
     };
     ctx.defer().await?;
 
-    let output_path = PathBuf::from(format!(
-        "./assets/gen/{}-tts.mp3",
-        voice_channel_id.to_string()
-    ));
-    generate_mp3(text, &output_path).await?;
+    let source = generate_mp3(text).await?;
     ctx.say("Playing your message...").await?;
 
     let manager = songbird::get(ctx.serenity_context())
         .await
         .expect("Songbird Voice client placed in at initialization.");
-    let source = SongFile::new(output_path);
     let track = Track::from(source).volume(1.0);
 
     if let Ok(call_lock) = manager.join(guild_id, voice_channel_id).await {
