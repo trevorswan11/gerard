@@ -44,6 +44,9 @@ fn load_wish_data() -> WishData {
         let raw_data = fs::read_to_string(DATA_FILE_PATH).expect("Failed to read json file");
         serde_json::from_str(&raw_data).unwrap_or_else(|_| WishData::default())
     } else {
+        if let Some(to_create) = Path::new(DATA_FILE_PATH).parent() {
+            fs::create_dir_all(to_create).unwrap();
+        }
         WishData::default()
     }
 }
@@ -156,6 +159,8 @@ pub async fn wish(
         .name(ctx.serenity_context().http.clone())
         .await?;
     if ctx.author().bot || channel_name != "wishing" {
+        ctx.say("You must be in the 'wishing' channel to use this command")
+            .await?;
         return Ok(());
     }
     ctx.defer().await?;
@@ -209,16 +214,14 @@ pub async fn wish(
         let pulls = text.parse::<usize>()?;
         if 1 <= pulls && pulls <= 90 {
             let results = summon(&user_id, &guild_id, pulls)?;
-            if let Ok((bytes, name)) = generate::combine_images(&user_id, results) {
-                ctx.send(
-                    poise::CreateReply::default()
-                        .attachment(CreateAttachment::bytes(bytes, name)),
-                )
-                .await?;
-            } else {
-                ctx.say("Fatal error encountered while generating resulting image")
-                    .await?;
-            }
+            let (bytes, name) =
+                tokio::task::spawn_blocking(move || generate::combine_images(&user_id, results))
+                    .await
+                    .map_err(|e| Box::new(e) as Error)??;
+            ctx.send(
+                poise::CreateReply::default().attachment(CreateAttachment::bytes(bytes, name)),
+            )
+            .await?;
         } else {
             ctx.say("Please input a value between 1 and 90").await?;
         }

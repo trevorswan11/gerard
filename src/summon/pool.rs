@@ -47,6 +47,7 @@ pub static FIVE_STAR_CHARACTERS_STANDARD: &[&str] = &[
     "mona.webp",
     "qiqi.webp",
     "tighnari.webp",
+    "yumemizuki_mizuki.webp",
 ];
 
 pub static FOUR_STAR_CHARACTERS: &[&str] = &[

@@ -1,8 +1,9 @@
 use crate::utils::driver::Error;
 
-use std::{path::PathBuf, io::Cursor};
+use std::{collections::HashMap, io::Cursor, path::PathBuf};
 
-use image::{DynamicImage, GenericImage, GenericImageView, ImageBuffer, RgbaImage};
+use image::{DynamicImage, GenericImage, ImageBuffer, RgbaImage};
+use rayon::prelude::*;
 use walkdir::WalkDir;
 
 pub static IMAGE_DIR: &str = "assets/summon_images";
@@ -14,14 +15,15 @@ pub fn combine_images(user_id: &str, image_names: Vec<String>) -> Result<(Vec<u8
         return Err("No images found".into());
     }
 
-    let mut images: Vec<DynamicImage> = vec![];
-    for path in image_paths {
-        if let Ok(img) = image::open(&path) {
-            images.push(img.to_rgba8().into());
-        } else {
-            return Err(format!("Failed to open image: {:?}", &path).into());
-        }
-    }
+    let images: Result<Vec<_>, _> = image_paths
+        .par_iter()
+        .map(|path| {
+            image::open(path)
+                .map(|img| img.to_rgba8())
+                .map_err(|e| Box::new(e) as Error)
+        })
+        .collect();
+    let images = images?;
 
     let total_images = images.len();
     let cols = if total_images <= 10 { 5 } else { 10 };
@@ -38,29 +40,28 @@ pub fn combine_images(user_id: &str, image_names: Vec<String>) -> Result<(Vec<u8
 
     let mut buffer = Cursor::new(Vec::new());
     let output_img = DynamicImage::ImageRgba8(combined);
-    output_img.write_to(&mut buffer, image::ImageFormat::Png)?;
-    Ok((buffer.into_inner(), format!("{user_id}-summon.png")))
+    output_img.write_to(&mut buffer, image::ImageFormat::WebP)?;
+    Ok((buffer.into_inner(), format!("{user_id}-summon.webp")))
 }
 
 fn find_images(image_names: Vec<String>, folder_path: &str) -> Result<Vec<PathBuf>, Error> {
-    let mut paths = Vec::new();
+    let file_map: HashMap<String, PathBuf> = WalkDir::new(folder_path)
+        .into_iter()
+        .filter_map(Result::ok)
+        .filter(|e| e.file_type().is_file())
+        .filter_map(|e| {
+            let name = e.file_name().to_str()?.to_owned();
+            Some((name, e.into_path()))
+        })
+        .collect();
 
-    for name in image_names {
-        for entry in WalkDir::new(folder_path)
-            .into_iter()
-            .filter_map(|e| e.ok())
-            .filter(|e| e.file_type().is_file())
-        {
-            if let Some(filename) = entry.file_name().to_str() {
-                if filename == name {
-                    paths.push(entry.path().to_path_buf());
-                    break;
-                }
-            } else {
-                return Err(format!("Invalid filename: {:?}", entry.file_name()).into());
-            }
-        }
-    }
-
-    Ok(paths)
+    image_names
+        .iter()
+        .map(|name| {
+            file_map
+                .get(name)
+                .cloned()
+                .ok_or_else(|| format!("Image not found: {name}").into())
+        })
+        .collect()
 }
