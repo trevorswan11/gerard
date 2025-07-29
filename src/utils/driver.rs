@@ -1,4 +1,4 @@
-use crate::external::{dict::*, tts::tts, wolfram::wolfram, qrcode::qrcode};
+use crate::external::{dict::*, qrcode::qrcode, tts::tts, wolfram::wolfram};
 use crate::internal::{basic::*, jar::jar};
 use crate::summon::wish::wish;
 

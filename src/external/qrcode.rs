@@ -2,7 +2,7 @@ use crate::utils::driver::*;
 
 use std::io::Cursor;
 
-use image::{Luma, ImageFormat};
+use image::{ImageFormat, Luma};
 use poise::serenity_prelude::CreateAttachment;
 use qrcode::QrCode;
 
@@ -13,7 +13,9 @@ use qrcode::QrCode;
 )]
 pub async fn qrcode(
     ctx: Context<'_>,
-    #[description = "The text to encode"] text: String,
+    #[rest]
+    #[description = "The text to encode"]
+    text: String,
 ) -> Result<(), Error> {
     let encoded = QrCode::new(text.as_bytes())?;
     let image = encoded

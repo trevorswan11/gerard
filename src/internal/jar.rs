@@ -44,7 +44,9 @@ async fn save(
     #[description = "User to save the quote for, or yourself by default"] user: Option<
         serenity::User,
     >,
-    #[description = "The quote text"] quote: String,
+    #[rest]
+    #[description = "The quote text"]
+    quote: String,
 ) -> Result<(), Error> {
     let user = user.as_ref().unwrap_or_else(|| ctx.author());
     let guild_id = ctx

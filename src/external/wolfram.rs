@@ -12,7 +12,9 @@ use urlencoding::encode;
 )]
 pub async fn wolfram(
     ctx: Context<'_>,
-    #[description = "Your query"] query: String,
+    #[rest]
+    #[description = "Your query"]
+    query: String,
 ) -> Result<(), Error> {
     let app_id = env::var("WOLFRAM_SIMPLE").expect("WOLFRAM_SIMPLE missing");
     ctx.defer().await?;

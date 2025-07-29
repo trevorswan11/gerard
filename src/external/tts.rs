@@ -99,8 +99,11 @@ async fn generate_mp3(text: String) -> Result<Vec<u8>, Error> {
 )]
 pub async fn tts(
     ctx: Context<'_>,
-    #[description = "The text to convert"] text: String,
+    #[rest]
+    #[description = "The text to convert"]
+    text: String,
 ) -> Result<(), Error> {
+    ctx.defer().await?;
     let guild_id = ctx.guild_id().ok_or("Guild ID not available")?;
     let voice_channel_id = {
         let guild = ctx
@@ -115,7 +118,6 @@ pub async fn tts(
             .and_then(|vs| vs.channel_id);
         vs.ok_or("You're not in a voice channel")?
     };
-    ctx.defer().await?;
 
     let source = generate_mp3(text).await?;
     ctx.say("Playing your message...").await?;
