@@ -5,13 +5,12 @@ use crate::utils::driver::*;
 use std::{collections::HashMap, fs, path::Path};
 
 use poise::serenity_prelude::CreateAttachment;
-use rand::Rng;
-use rand::seq::IndexedRandom;
+use rand::{Rng, seq::IndexedRandom};
 use serde::{Deserialize, Serialize};
 
-static DATA_FILE_PATH: &str = "assets/stored_data/wish_data.json";
-static BASE_FIVE_STAR_CHANCE: f64 = 0.006;
-static BASE_FOUR_STAR_CHANCE: f64 = 0.051;
+const DATA_FILE_PATH: &str = "assets/stored_data/wish_data.json";
+const BASE_FIVE_STAR_CHANCE: f64 = 0.006;
+const BASE_FOUR_STAR_CHANCE: f64 = 0.051;
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 struct UserData {

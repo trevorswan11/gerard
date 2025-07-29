@@ -6,8 +6,7 @@ use image::{DynamicImage, GenericImage, ImageBuffer, RgbaImage};
 use rayon::prelude::*;
 use walkdir::WalkDir;
 
-pub static IMAGE_DIR: &str = "assets/summon_images";
-pub static OUTPUT_DIR: &str = "assets/gen";
+const IMAGE_DIR: &str = "assets/summon_images";
 
 pub fn combine_images(user_id: &str, image_names: Vec<String>) -> Result<(Vec<u8>, String), Error> {
     let image_paths = find_images(image_names, IMAGE_DIR)?;

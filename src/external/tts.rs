@@ -9,7 +9,7 @@ use songbird::tracks::Track;
 use tokio::time::sleep;
 use yup_oauth2::{ServiceAccountAuthenticator, ServiceAccountKey};
 
-static ACCESS_TOKEN_PATH: &str = "service_account.json";
+const ACCESS_TOKEN_PATH: &str = "service_account.json";
 
 #[derive(Serialize)]
 struct TtsRequest<'a> {
@@ -99,9 +99,7 @@ async fn generate_mp3(text: String) -> Result<Vec<u8>, Error> {
 )]
 pub async fn tts(
     ctx: Context<'_>,
-    #[rest]
-    #[description = "The text to convert"]
-    text: String,
+    #[description = "The text to convert"] text: String,
 ) -> Result<(), Error> {
     let guild_id = ctx.guild_id().ok_or("Guild ID not available")?;
     let voice_channel_id = {

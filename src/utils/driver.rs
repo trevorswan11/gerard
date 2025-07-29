@@ -1,5 +1,5 @@
-use crate::external::{dict::*, tts::tts, wolfram::wolfram};
-use crate::internal::basic::*;
+use crate::external::{dict::*, tts::tts, wolfram::wolfram, qrcode::qrcode};
+use crate::internal::{basic::*, jar::jar};
 use crate::summon::wish::wish;
 
 use poise::serenity_prelude as serenity;
@@ -21,6 +21,8 @@ pub async fn start_bot(discord_token: &str, intents: serenity::GatewayIntents) {
                 synonyms(),
                 antonyms(),
                 wolfram(),
+                jar(),
+                qrcode(),
             ],
             prefix_options: poise::PrefixFrameworkOptions {
                 prefix: Some("!".into()),
