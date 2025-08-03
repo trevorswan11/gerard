@@ -1,0 +1,3 @@
+[submodule "libs/mclocate"]
+	path = libs/mclocate
+	url = https://github.com/trevorswan11/mc-locate
