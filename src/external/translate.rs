@@ -1,12 +1,12 @@
 #![allow(non_snake_case)]
-use crate::utils::driver::*;
 use crate::external::languages::LanguageCode;
+use crate::utils::driver::*;
 
-use std::{env, collections::HashSet};
+use std::{collections::HashSet, env};
 
-use urlencoding::encode;
 use reqwest::Client;
-use serde::{Deserialize};
+use serde::Deserialize;
+use urlencoding::encode;
 
 #[derive(Deserialize)]
 struct TranslateResponse {
@@ -45,8 +45,7 @@ struct LanguageOpt {
 )]
 pub async fn translate(
     ctx: Context<'_>,
-    #[description = "The language code you wish to translate to"]
-    code: LanguageCode,
+    #[description = "The language code you wish to translate to"] code: LanguageCode,
     #[rest]
     #[description = "The text you wish to translate"]
     query: String,
@@ -60,10 +59,13 @@ pub async fn translate(
         encode(code.as_str()),
         encode(&api_key)
     );
-    
+
     let res = Client::new().get(&url).send().await?;
     if res.status().is_success() {
-        let json: TranslateResponse = res.json().await.map_err(|e| format!("Parsing error: {}", e))?;
+        let json: TranslateResponse = res
+            .json()
+            .await
+            .map_err(|e| format!("Parsing error: {}", e))?;
         let translated = &json.data.translations[0].translatedText;
         ctx.say(translated).await?;
     } else {

@@ -4,7 +4,7 @@ use crate::utils::driver::*;
 
 use std::{collections::HashMap, fs, path::Path};
 
-use poise::serenity_prelude::CreateAttachment;
+use poise::{CreateReply, serenity_prelude::CreateAttachment};
 use rand::{Rng, seq::IndexedRandom};
 use serde::{Deserialize, Serialize};
 
@@ -220,10 +220,8 @@ pub async fn wish(
                 tokio::task::spawn_blocking(move || generate::combine_images(&user_id, results))
                     .await
                     .map_err(|e| Box::new(e) as Error)??;
-            ctx.send(
-                poise::CreateReply::default().attachment(CreateAttachment::bytes(bytes, name)),
-            )
-            .await?;
+            ctx.send(CreateReply::default().attachment(CreateAttachment::bytes(bytes, name)))
+                .await?;
         } else {
             ctx.say("Please input a value between 1 and 90").await?;
         }

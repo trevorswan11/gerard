@@ -2,7 +2,11 @@ use crate::utils::driver::*;
 
 use poise::serenity_prelude as serenity;
 
-#[poise::command(slash_command, prefix_command)]
+#[poise::command(
+    slash_command,
+    prefix_command,
+    description_localized("en-US", "Get the age of you or a specified user in this server")
+)]
 pub async fn age(
     ctx: Context<'_>,
     #[description = "Selected user"] user: Option<serenity::User>,

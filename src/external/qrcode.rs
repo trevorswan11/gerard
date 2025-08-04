@@ -3,7 +3,7 @@ use crate::utils::driver::*;
 use std::io::Cursor;
 
 use image::{ImageFormat, Luma};
-use poise::serenity_prelude::CreateAttachment;
+use poise::{CreateReply, serenity_prelude::CreateAttachment};
 use qrcode::QrCode;
 
 #[poise::command(
@@ -29,8 +29,7 @@ pub async fn qrcode(
     let image_name = format!("{}-qrcode.jpg", ctx.author().id.get());
 
     ctx.send(
-        poise::CreateReply::default()
-            .attachment(CreateAttachment::bytes(buf.into_inner(), image_name)),
+        CreateReply::default().attachment(CreateAttachment::bytes(buf.into_inner(), image_name)),
     )
     .await?;
 
