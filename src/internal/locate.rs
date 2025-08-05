@@ -1,12 +1,13 @@
-use crate::utils::driver::*;
+use crate::utils::{chunk_str, driver::*};
 
 use std::process::{Command, Stdio};
 
 use poise::{ChoiceParameter, serenity_prelude::CreateMessage};
 
 const BINARY_PATH: &str = "libs/mclocate/zig-out/bin/mclocate";
-const DEFAULT_SEED: i64 = 6304398765943131469;
-const MAX_DISCORD_MSG_LENGTH: usize = 2000;
+
+pub const DEFAULT_SEED: i64 = 6304398765943131469;
+pub const MODDED_SEED: i64 = -8043673821771508434;
 
 #[derive(Debug, Clone, ChoiceParameter)]
 pub enum CommandOpt {
@@ -69,13 +70,6 @@ fn run_command(args: Vec<&str>) -> Result<String, Error> {
         "No output"
     };
     Ok(msg.to_string())
-}
-
-fn chunk_str(s: &str) -> Vec<String> {
-    s.as_bytes()
-        .chunks(MAX_DISCORD_MSG_LENGTH)
-        .map(|c| String::from_utf8_lossy(c).into_owned())
-        .collect()
 }
 
 #[poise::command(

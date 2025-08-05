@@ -104,7 +104,6 @@ async fn list(
     slash_command,
     prefix_command,
     subcommands("save", "list"),
-    category = "Quotes",
     description_localized("en-US", "Manage or view user quotes")
 )]
 pub async fn jar(_: Context<'_>) -> Result<(), Error> {

@@ -57,7 +57,6 @@ fn save_wish_data(data: &WishData) {
 fn summon(user_id: &str, guild_id: &str, pulls: usize) -> Result<Vec<String>, Error> {
     let mut data = load_wish_data();
     let mut rng = rand::rng();
-    rng.reseed()?;
 
     let user_data = data.users.entry(user_id.to_string()).or_default();
     let guild_data = data.guilds.entry(guild_id.to_string()).or_default();
@@ -154,13 +153,13 @@ fn summon(user_id: &str, guild_id: &str, pulls: usize) -> Result<Vec<String>, Er
 )]
 pub async fn wish(
     ctx: Context<'_>,
-    #[description = "Either 'me', 'server', or number (1-90)"] text: String,
+    #[description = "Either 'me', 'server', or a number (1-90)"] option: String,
 ) -> Result<(), Error> {
     let channel_name = ctx
         .channel_id()
         .name(ctx.serenity_context().http.clone())
         .await?;
-    if ctx.author().bot || channel_name != "wishing" {
+    if ctx.author().bot || (channel_name != "wishing" && channel_name != "bot-tester") {
         ctx.say("You must be in the 'wishing' channel to use this command")
             .await?;
         return Ok(());
@@ -178,7 +177,7 @@ pub async fn wish(
     let default_guild = GuildData::default();
     let guild_data = guilds.get(&guild_id).unwrap_or(&default_guild);
 
-    if text == "me" {
+    if option == "me" {
         let total_pulls = user_data.totalPulls;
         let five_star_pity = user_data.fiveStarPity;
         let four_star_pity = user_data.fourStarPity;
@@ -194,7 +193,7 @@ pub async fn wish(
 "#
         ))
         .await?;
-    } else if text == "server" {
+    } else if option == "server" {
         let total_pulls = guild_data.totalPulls;
         let total_four_stars = guild_data.totalFourStars;
         let total_won = guild_data.totalWon;
@@ -213,13 +212,10 @@ pub async fn wish(
         ))
         .await?;
     } else {
-        let pulls = text.parse::<usize>()?;
+        let pulls = option.parse::<usize>()?;
         if 1 <= pulls && pulls <= 90 {
             let results = summon(&user_id, &guild_id, pulls)?;
-            let (bytes, name) =
-                tokio::task::spawn_blocking(move || generate::combine_images(&user_id, results))
-                    .await
-                    .map_err(|e| Box::new(e) as Error)??;
+            let (bytes, name) = generate::combine_images(&user_id, results)?;
             ctx.send(CreateReply::default().attachment(CreateAttachment::bytes(bytes, name)))
                 .await?;
         } else {
