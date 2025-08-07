@@ -80,7 +80,10 @@ impl EventHandler for Handler {
             if let Err(e) = msg.channel_id.say(ctx.http, format!("{word}?")).await {
                 eprintln!("Failed to send message: {}", e);
             }
-        } else {
+        } else if lower_msg.contains("thank you gerard") {
+            if let Err(e) = msg.channel_id.say(ctx.http, format!("Anytime, {}!", msg.author)).await {
+                eprintln!("Failed to send message: {}", e);
+            }
         }
     }
 }
