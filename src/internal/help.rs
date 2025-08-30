@@ -63,8 +63,8 @@ pub async fn server(
 ) -> Result<(), Error> {
     let ip = reqwest::get("https://api.ipify.org").await?.text().await?;
     let (address, modded_flag) = match server {
-        ServerType::Modded => (format!("{}:9768", ip), true),
-        ServerType::Unmodded => (format!("{}:9769", ip), false),
+        ServerType::Modded => (format!("{}:9769", ip), true),
+        ServerType::Unmodded => (format!("{}:9768", ip), false),
     };
 
     let msg = match modded_flag {
