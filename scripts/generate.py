@@ -235,7 +235,7 @@ def generate_lus(directory: str):
         f.write('pub static COPYPASTA_KEYS: &[&str] = &[\n')
         for _, lu_key, _ in sorted(copypastas):
             f.write(f"    \"{lu_key}\",\n")
-        f.write(f'];\n\n')
+        f.write('];\n\n')
             
         f.write("pub fn copypasta_lu() -> HashMap<&'static str, &'static str> {\n")
         f.write("    HashMap::from([\n")

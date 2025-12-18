@@ -1,2 +1,2 @@
 #!/bin/bash
-tmux attach -t gerard-bot
+tmux attach -t gerard
