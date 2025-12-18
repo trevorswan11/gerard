@@ -4,7 +4,6 @@ use crate::utils::{driver::*, lus::*};
 use std::env;
 
 use poise::ChoiceParameter;
-use reqwest;
 
 #[derive(Debug, Clone, ChoiceParameter)]
 enum ServerType {
@@ -64,21 +63,18 @@ pub async fn server(
     ctx: Context<'_>,
     #[description = "The server to get help for"] server: ServerType,
 ) -> Result<(), Error> {
-    let ip = reqwest::get("https://api.ipify.org").await?.text().await?;
     let (address, modded_flag) = match server {
         ServerType::Modded => (
             format!(
-                "{}:{}",
-                ip,
-                env::var("MODDED_PORT").expect("MODDED_PORT missing")
+                "{}",
+                env::var("MODDED_SERVER").expect("MODDED_SERVER missing")
             ),
             true,
         ),
         ServerType::Unmodded => (
             format!(
-                "{}:{}",
-                ip,
-                env::var("UNMODDED_PORT").expect("UNMODDED_PORT missing")
+                "{}",
+                env::var("UNMODDED_SERVER").expect("UNMODDED_SERVER missing")
             ),
             false,
         ),
