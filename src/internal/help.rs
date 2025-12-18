@@ -1,6 +1,8 @@
 use crate::internal::locate::{DEFAULT_SEED, MODDED_SEED};
 use crate::utils::{driver::*, lus::*};
 
+use std::env;
+
 use poise::ChoiceParameter;
 use reqwest;
 
@@ -18,7 +20,7 @@ pub fn unmodded(server_address: &str) -> String {
         - Address: {}\n\
         - World Spawn: (1371, 127, 765)\n\
         - Seed: {}\n\
-        - Server Version: 1.21.7\n\
+        - Server Version: 1.21.10\n\
         *Please reach out to Trevor for any help!*\n\n\
         **_Please do not directly share the server's IP address :smile:_**",
         server_address,
@@ -28,7 +30,7 @@ pub fn unmodded(server_address: &str) -> String {
 
 pub fn modded(server_address: &str) -> String {
     format!(
-        "**Modded Java Minecraft Server**\n\
+        "**Modded Java Minecraft Server (Currently Down)**\n\
         - Open Minecraft Launcher and Install Minecraft Version 1.18.2\n\
         - Download Forge for Minecraft 1.18.2 [Here](<https://files.minecraftforge.net/net/minecraftforge/forge/index_1.18.2.html>)\n\
           - Installer will bombard you with adds, just wait about 5 seconds and press 'Skip' in the top right corner!\n\
@@ -46,6 +48,7 @@ pub fn modded(server_address: &str) -> String {
         - Seed: {}\n\
         - Server Version: 1.18.2\n\
         *Please reach out to Trevor for any help!*\n\n\
+        *The server is not up, and will not be unless requested, to save resources!*
         **_Please do not directly share the server's IP address :smile:_**",
         server_address,
         MODDED_SEED.to_string()
@@ -63,8 +66,22 @@ pub async fn server(
 ) -> Result<(), Error> {
     let ip = reqwest::get("https://api.ipify.org").await?.text().await?;
     let (address, modded_flag) = match server {
-        ServerType::Modded => (format!("{}:9769", ip), true),
-        ServerType::Unmodded => (format!("{}:9768", ip), false),
+        ServerType::Modded => (
+            format!(
+                "{}:{}",
+                ip,
+                env::var("MODDED_PORT").expect("MODDED_PORT missing")
+            ),
+            true,
+        ),
+        ServerType::Unmodded => (
+            format!(
+                "{}:{}",
+                ip,
+                env::var("UNMODDED_PORT").expect("UNMODDED_PORT missing")
+            ),
+            false,
+        ),
     };
 
     let msg = match modded_flag {
