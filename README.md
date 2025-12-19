@@ -29,6 +29,7 @@ THESAURUS_KEY="placeholder"
 WOLFRAM_SIMPLE="placeholder"
 MODDED_PORT="placeholder"
 UNMODDED_PORT="placeholder"
+ADMIN="placeholder"
 ```
 - Download [Zig 0.14.1](https://ziglang.org/download/) (Other versions may fail to compile) and build `mclocate` (libs\mclocate). For best results, run:
 ```

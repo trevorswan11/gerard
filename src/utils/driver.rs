@@ -33,6 +33,7 @@ pub async fn start_bot(discord_token: &str, intents: serenity::GatewayIntents) {
                 server(),
                 lethal(),
                 help(),
+                smile(),
             ],
             prefix_options: poise::PrefixFrameworkOptions {
                 prefix: Some("!".into()),

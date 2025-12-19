@@ -19,7 +19,7 @@ pub fn unmodded(server_address: &str) -> String {
         - Address: {}\n\
         - World Spawn: (1371, 127, 765)\n\
         - Seed: {}\n\
-        - Server Version: 1.21.10\n\
+        - Server Version: 1.21.11\n\
         *Please reach out to Trevor for any help!*\n\n\
         **_Please do not directly share the server's IP address :smile:_**",
         server_address,
@@ -61,17 +61,17 @@ pub fn modded(server_address: &str) -> String {
 )]
 pub async fn server(
     ctx: Context<'_>,
-    #[description = "The server to get help for"] server: ServerType,
+    #[description = "The server to get help for"] server: Option<ServerType>,
 ) -> Result<(), Error> {
     let (address, modded_flag) = match server {
-        ServerType::Modded => (
+        Some(ServerType::Modded) => (
             format!(
                 "{}",
                 env::var("MODDED_SERVER").expect("MODDED_SERVER missing")
             ),
             true,
         ),
-        ServerType::Unmodded => (
+        _ => (
             format!(
                 "{}",
                 env::var("UNMODDED_SERVER").expect("UNMODDED_SERVER missing")
@@ -125,5 +125,21 @@ pub async fn help(ctx: Context<'_>) -> Result<(), Error> {
         ..Default::default()
     };
     poise::builtins::help(ctx, None, config).await?;
+    Ok(())
+}
+
+#[poise::command(slash_command, description_localized("en-US", "Some happiness."))]
+pub async fn smile(ctx: Context<'_>) -> Result<(), Error> {
+    let channel_name = ctx
+        .channel_id()
+        .name(ctx.serenity_context().http.clone())
+        .await?;
+    let admin_id = env::var("ADMIN").expect("ADMIN user id missing");
+    if ctx.author().id.to_string() == admin_id && channel_name == "bot-tester" {
+        let ip = reqwest::get("https://api.ipify.org").await?.text().await?;
+        ctx.say(&format!("{}", ip)).await?;
+    } else {
+        ctx.say("I'm so happy to be here :)").await?;
+    }
     Ok(())
 }
