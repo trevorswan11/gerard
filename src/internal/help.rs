@@ -19,11 +19,12 @@ pub fn unmodded(server_address: &str) -> String {
         - Address: {}\n\
         - World Spawn: (1371, 127, 765)\n\
         - Seed: {}\n\
-        - Server Version: 26.1.1\n\
+        - Server Version: {}\n\
         *Please reach out to Trevor for any help!*\n\n\
         **_Please do not directly share the server's IP address :smile:_**",
         server_address,
-        DEFAULT_SEED.to_string()
+        DEFAULT_SEED.to_string(),
+        env::var("UNMODDED_SERVER_VERSION").unwrap_or("Unknown".to_string())
     )
 }
 
@@ -45,12 +46,13 @@ pub fn modded(server_address: &str) -> String {
         - Address: {}\n\
         - World Spawn: (129, 63, -156)\n\
         - Seed: {}\n\
-        - Server Version: 1.18.2\n\
+        - Server Version: {}\n\
         *Please reach out to Trevor for any help!*\n\n\
         *The server is not up, and will not be unless requested, to save resources!*
         **_Please do not directly share the server's IP address :smile:_**",
         server_address,
-        MODDED_SEED.to_string()
+        MODDED_SEED.to_string(),
+        env::var("MODDED_SERVER_VERSION").unwrap_or("Unknown".to_string())
     )
 }
 
