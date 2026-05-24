@@ -105,6 +105,7 @@ pub fn gif_lu() -> HashMap<&'static str, &'static str> {
             "skeleton",
             "https://tenor.com/view/skeleton-spin-fan-rope-gif-25248314",
         ),
+        ("spelling", "https://klipy.com/gifs/patrick-star-minor-s"),
         (
             "wsl",
             "https://tenor.com/view/robin-robin-hsr-robin-star-rail-robin-honkai-star-rail-robin-disappointed-gif-6780156215518762303",

@@ -122,6 +122,7 @@ gifs = [
     ("bust", "https://tenor.com/view/aventurine-star-rail-i-love-gambling-roulette-gif-15600735931808948001"),
     ("skeleton", "https://tenor.com/view/skeleton-spin-fan-rope-gif-25248314"),
     ("are you sure", "https://tenor.com/view/omni-man-omni-man-are-you-sure-are-you-sure-invincible-gif-3935116808772397515"),
+    ("spelling", "https://klipy.com/gifs/patrick-star-minor-s")
 ]
 
 copypastas = [
