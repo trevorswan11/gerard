@@ -127,20 +127,23 @@ pub async fn tts(
         .expect("Songbird Voice client placed in at initialization.");
     let track = Track::from(source).volume(1.0);
 
-    if let Ok(call_lock) = manager.join(guild_id, voice_channel_id).await {
-        let mut call = call_lock.lock().await;
-        let track_handle = call.play(track);
-        while let Some(state) = track_handle.get_info().await.ok() {
-            if state.playing.is_done() {
-                break;
+    match manager.join(guild_id, voice_channel_id).await {
+        Ok(call_lock) => {
+            let mut call = call_lock.lock().await;
+            let track_handle = call.play(track);
+            while let Some(state) = track_handle.get_info().await.ok() {
+                if state.playing.is_done() {
+                    break;
+                }
+                sleep(Duration::from_millis(250)).await;
             }
-            sleep(Duration::from_millis(250)).await;
+    
+            call.leave().await?;
         }
-
-        call.leave().await?;
-    } else {
-        ctx.say("Failed to join voice channel.").await?;
-    }
-
+        Err(e) => {
+            ctx.say("Failed to join voice channel.").await?;
+            eprintln!("{e}");
+        }
+    };
     Ok(())
 }
